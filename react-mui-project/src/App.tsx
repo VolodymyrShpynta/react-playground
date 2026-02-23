@@ -4,10 +4,10 @@ import { MuiButton } from './components/MuiButton'
 
 function App() {
   return (
-    <>
+    <div className="App">
       {/* <MuiTypography /> */}
       <MuiButton />
-    </>
+    </div>
   )
 }
 
