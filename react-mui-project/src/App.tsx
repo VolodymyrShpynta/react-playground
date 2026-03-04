@@ -1,5 +1,5 @@
 import './App.css'
-import { MuiNavbar } from './components/MuiNavBar'
+// import { MuiNavbar } from './components/MuiNavBar'
 // import { MuiImageList } from './components/MuiImageList'
 // import { MuiAccordion } from './components/MuiAccordion'
 // import { MuiCard } from './components/MuiCard'
@@ -13,6 +13,7 @@ import { MuiNavbar } from './components/MuiNavBar'
 // import { MuiTextField } from './components/MuiTextField'
 // import { MuiButton } from './components/MuiButton'
 // import { MuiTypography } from './components/MuiTypography'
+import { MuiLink } from './components/MuiLink'
 
 function App() {
   return (
@@ -30,7 +31,8 @@ function App() {
       {/* <MuiCard /> */}
       {/* <MuiAccordion /> */}
       {/* <MuiImageList /> */}
-      <MuiNavbar />
+      {/* <MuiNavbar /> */}
+      <MuiLink />
     </div>
   )
 }
