@@ -1,7 +1,17 @@
+import { ThemeProvider } from "@emotion/react";
+import { ColorModeToggleContext, useColorTheme } from "./theme"
+
 function App() {
+  const [theme, colorModeToggle] = useColorTheme();
+
   return (
-    <div className="app">
-    </div>
+    <ColorModeToggleContext.Provider value={colorModeToggle}>
+      <ThemeProvider theme={theme}>
+        <div className="app">
+          <main className="content">Admin Dashboard</main>
+        </div>
+      </ThemeProvider>
+    </ColorModeToggleContext.Provider>
   )
 }
 
