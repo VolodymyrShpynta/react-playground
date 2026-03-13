@@ -1,6 +1,9 @@
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { ColorModeToggleContext, useColorTheme } from "./theme"
 import Topbar from "./scenes/global/Topbar";
+import { Route, Routes } from 'react-router-dom';
+import Dashboard from './scenes/dashboard';
+import Sidebar from './scenes/global/Sidebar';
 
 function App() {
   const [theme, colorModeToggle] = useColorTheme();
@@ -10,8 +13,22 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline /> {/* Applies theme-aware global reset so body/background follow light-dark mode  */}
         <div className="app">
+          <Sidebar />
           <main className="content">
             <Topbar />
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              {/* <Route path="/team" element={<Team />} /> */}
+              {/* <Route path="/contacts" element={<Contacts />} /> */}
+              {/* <Route path="/invoices" element={<Invoices />} /> */}
+              {/* <Route path="/form" element={<Form />} /> */}
+              {/* <Route path="/bar" element={<Bar />} /> */}
+              {/* <Route path="/pie" element={<Pie />} /> */}
+              {/* <Route path="/line" element={<Line />} /> */}
+              {/* <Route path="/faq" element={<FAQ />} /> */}
+              {/* <Route path="/calendar" element={<Calendar />} /> */}
+              {/* <Route path="/geography" element={<Geography />} /> */}
+            </Routes>
           </main>
         </div>
       </ThemeProvider>
