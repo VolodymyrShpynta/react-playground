@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material/styles";
-import { IconButton, Tooltip, Typography } from "@mui/material";
+import { IconButton, Tooltip, Typography, type TooltipProps } from "@mui/material";
 import { colorTokens } from "../../theme";
 import { useMemo, useState, type ReactNode } from "react";
 import { NavLink, useLocation } from 'react-router-dom';
@@ -40,6 +40,7 @@ interface SidebarItemProps {
   item: SidebarItemConfig
   isCollapsed: boolean
   isActive: boolean
+  tooltipSlotProps: TooltipProps['slotProps']
 }
 
 const sections: SidebarSectionConfig[] = [
@@ -73,7 +74,7 @@ const sections: SidebarSectionConfig[] = [
   },
 ]
 
-const SidebarItem = ({ item, isCollapsed, isActive }: SidebarItemProps) => {
+const SidebarItem = ({ item, isCollapsed, isActive, tooltipSlotProps }: SidebarItemProps) => {
   const menuItem = (
     <MenuItem
       active={isActive}
@@ -89,7 +90,7 @@ const SidebarItem = ({ item, isCollapsed, isActive }: SidebarItemProps) => {
   }
 
   return (
-    <Tooltip title={item.title} placement="right" arrow>
+    <Tooltip title={item.title} placement="right" arrow slotProps={tooltipSlotProps}>
       <Box component="span" sx={{ display: 'block' }}>
         {menuItem}
       </Box>
@@ -103,6 +104,36 @@ const Sidebar = () => {
   const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const handleToggleSidebar = () => setIsCollapsed((prev) => !prev)
+
+  const tooltipSlotProps = useMemo<TooltipProps['slotProps']>(
+    () => ({
+      tooltip: {
+        sx: {
+          ...theme.typography.body2,
+          fontFamily: theme.typography.fontFamily,
+          fontSize: theme.typography.pxToRem(14),
+          fontWeight: theme.typography.fontWeightMedium,
+          lineHeight: 1.35,
+          px: 1.5,
+          py: 1,
+          backgroundColor: colors.primary[400],
+          color: colors.grey[100],
+          border: `1px solid ${colors.blueAccent[500]}`,
+          boxShadow: `0 8px 24px ${colors.primary[900]}66`,
+        },
+      },
+      arrow: {
+        sx: {
+          color: colors.primary[400],
+          '&::before': {
+            boxSizing: 'border-box',
+            border: `1px solid ${colors.blueAccent[500]}`,
+          },
+        },
+      },
+    }),
+    [colors, theme]
+  )
 
   const menuItemStyles = useMemo<MenuItemStyles>(
     () => ({
@@ -255,6 +286,7 @@ const Sidebar = () => {
                     item={item}
                     isCollapsed={isCollapsed}
                     isActive={isItemActive(item.to)}
+                    tooltipSlotProps={tooltipSlotProps}
                   />
                 ))}
               </Box>
