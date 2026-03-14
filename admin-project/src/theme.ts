@@ -129,6 +129,12 @@ export const colorTokens = (mode: PaletteMode) => ({
 // mui theme settings
 export const themeSettings = (mode: PaletteMode) => {
   const colors = colorTokens(mode);
+  const scrollbarTrack = mode === 'dark' ? colors.primary[500] : colors.grey[900];
+  const scrollbarThumbStart = mode === 'dark' ? colors.primary[400] : colors.grey[600];
+  const scrollbarThumbEnd = mode === 'dark' ? colors.blueAccent[600] : colors.grey[400];
+  const scrollbarThumbHoverStart = mode === 'dark' ? colors.blueAccent[400] : colors.blueAccent[500];
+  const scrollbarThumbHoverEnd = mode === 'dark' ? colors.blueAccent[500] : colors.blueAccent[400];
+
   return {
     palette: {
       mode: mode,
@@ -177,6 +183,37 @@ export const themeSettings = (mode: PaletteMode) => {
       h4: { fontSize: 20 },
       h5: { fontSize: 16 },
       h6: { fontSize: 14 },
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          html: {
+            scrollbarGutter: 'stable',
+          },
+          '*': {
+            scrollbarWidth: 'thin',
+            scrollbarColor: `${scrollbarThumbStart} ${scrollbarTrack}`,
+          },
+          '*::-webkit-scrollbar': {
+            width: '12px',
+            height: '12px',
+          },
+          '*::-webkit-scrollbar-track': {
+            backgroundColor: scrollbarTrack,
+          },
+          '*::-webkit-scrollbar-thumb': {
+            background: `linear-gradient(180deg, ${scrollbarThumbStart} 0%, ${scrollbarThumbEnd} 100%)`,
+            border: `3px solid ${scrollbarTrack}`,
+            borderRadius: '999px',
+          },
+          '*::-webkit-scrollbar-thumb:hover': {
+            background: `linear-gradient(180deg, ${scrollbarThumbHoverStart} 0%, ${scrollbarThumbHoverEnd} 100%)`,
+          },
+          '*::-webkit-scrollbar-corner': {
+            backgroundColor: scrollbarTrack,
+          },
+        },
+      },
     },
   };
 };

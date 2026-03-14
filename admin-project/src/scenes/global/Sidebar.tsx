@@ -195,6 +195,9 @@ const Sidebar = () => {
           minHeight: '100vh',
           backgroundColor: colors.primary[400],
           borderRight: 'none',
+          borderTopRightRadius: '6px',
+          borderBottomRightRadius: '6px',
+          overflow: 'hidden',
           [`&.${sidebarClasses.rtl}`]: {
             borderLeft: 'none',
           },
@@ -202,8 +205,10 @@ const Sidebar = () => {
             height: 'auto',
             minHeight: '100vh',
             backgroundColor: colors.primary[400],
-            overflowY: 'visible',
-            overflowX: 'visible',
+            borderTopRightRadius: 'inherit',
+            borderBottomRightRadius: 'inherit',
+            overflowY: 'auto',
+            overflowX: 'hidden',
           },
         }}
       >
@@ -224,7 +229,7 @@ const Sidebar = () => {
                   noWrap
                   sx={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
                 >
-                  ADMINISTRATORS
+                  ADMIN PANEL
                 </Typography>
                 <IconButton
                   aria-label="Toggle sidebar"
