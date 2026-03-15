@@ -25,21 +25,25 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 
+/** A single navigation entry in the sidebar. */
 interface SidebarItemConfig {
   title: string
   to: string
   icon: ReactNode
 }
 
+/** A labelled group of navigation items. `heading` is hidden when the sidebar is collapsed. */
 interface SidebarSectionConfig {
   heading?: string
   items: SidebarItemConfig[]
 }
 
+/** Props forwarded from the parent Sidebar to each individual nav item. */
 interface SidebarItemProps {
   item: SidebarItemConfig
   isCollapsed: boolean
   isActive: boolean
+  /** Shared tooltip appearance — memoised by the parent to avoid object churn. */
   tooltipSlotProps: TooltipProps['slotProps']
 }
 
@@ -74,6 +78,18 @@ const sections: SidebarSectionConfig[] = [
   },
 ]
 
+/**
+ * Returns `true` when `to` matches the current `pathname`.
+ * The root route requires an exact match to prevent it from activating on every path.
+ */
+const isRouteActive = (to: string, pathname: string): boolean =>
+  to === '/' ? pathname === '/' : pathname.startsWith(to)
+
+/**
+ * A single row in the sidebar navigation.
+ * When collapsed, the label is hidden and a Tooltip is added so the title stays accessible.
+ * The `Box component="span"` wrapper is required so MUI Tooltip can attach its ref.
+ */
 const SidebarItem = ({ item, isCollapsed, isActive, tooltipSlotProps }: SidebarItemProps) => {
   const menuItem = (
     <MenuItem
@@ -105,6 +121,8 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const handleToggleSidebar = () => setIsCollapsed((prev) => !prev)
 
+  // Memoised so the same object reference is passed to every SidebarItem,
+  // preventing unnecessary Tooltip re-renders when the sidebar re-renders.
   const tooltipSlotProps = useMemo<TooltipProps['slotProps']>(
     () => ({
       tooltip: {
@@ -135,6 +153,8 @@ const Sidebar = () => {
     [colors, theme]
   )
 
+  // Memoised to avoid recalculating CSS strings on every render; only changes
+  // when the colour theme or collapse state actually changes.
   const menuItemStyles = useMemo<MenuItemStyles>(
     () => ({
       button: {
@@ -146,17 +166,23 @@ const Sidebar = () => {
         color: colors.grey[100],
         backgroundColor: 'transparent',
         transition: 'background-color 120ms ease, color 120ms ease',
+        // react-pro-sidebar injects inline padding styles that take precedence;
+        // !important is the only reliable way to override them when collapsed.
         ...(isCollapsed && {
           paddingLeft: '0 !important',
           paddingRight: '0 !important',
         }),
         '&:hover': {
+          // 1F ≈ 12 % opacity — subtle highlight without washing out the icon colour
           backgroundColor: `${colors.blueAccent[500]}1F`,
           color: `${colors.blueAccent[400]} !important`,
         },
         [`&.${menuClasses.active}`]: {
+          // 30 ≈ 19 % opacity — stronger fill for the active item
           backgroundColor: `${colors.blueAccent[500]}30`,
           color: `${colors.blueAccent[500]} !important`,
+          // Use an inset box-shadow to simulate a border without affecting layout.
+          // Collapsed: full outline ring; expanded: left-edge accent strip.
           ...(isCollapsed
             ? { boxShadow: `inset 0 0 0 2px ${colors.blueAccent[500]}` }
             : { boxShadow: `inset 3px 0 0 ${colors.blueAccent[500]}` }),
@@ -175,14 +201,6 @@ const Sidebar = () => {
     }),
     [colors, isCollapsed]
   )
-
-  const isItemActive = (to: string) => {
-    if (to === '/') {
-      return pathname === '/'
-    }
-
-    return pathname.startsWith(to)
-  }
 
   return (
     <Box>
@@ -213,12 +231,13 @@ const Sidebar = () => {
         }}
       >
         <Menu menuItemStyles={menuItemStyles}>
-          {/* LOGO AND MENU ICON */}
+          {/* Header: collapse toggle + branding */}
+          {/* MenuItem is from react-pro-sidebar (not MUI) so it only accepts style, not sx */}
           <MenuItem
             onClick={handleToggleSidebar}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: '10px 0 20px 0',
               color: colors.grey[100],
             }}
           >
@@ -252,8 +271,8 @@ const Sidebar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                  src="../../assets/user.png"
+                  style={{ cursor: 'pointer', borderRadius: '50%' }}
                 />
               </Box>
               <Box textAlign="center">
@@ -290,7 +309,7 @@ const Sidebar = () => {
                     key={item.to}
                     item={item}
                     isCollapsed={isCollapsed}
-                    isActive={isItemActive(item.to)}
+                    isActive={isRouteActive(item.to, pathname)}
                     tooltipSlotProps={tooltipSlotProps}
                   />
                 ))}
