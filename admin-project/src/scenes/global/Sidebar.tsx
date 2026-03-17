@@ -1,7 +1,7 @@
 import { useTheme, type Theme } from "@mui/material/styles";
 import { IconButton, Tooltip, Typography, type TooltipProps } from "@mui/material";
 import { colorTokens } from "../../theme";
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { NavLink, useLocation } from 'react-router-dom';
 import Box from "@mui/material/Box";
 import {
@@ -48,6 +48,11 @@ interface SidebarItemProps {
   /** Shared tooltip appearance — memoised by the parent to keep the object reference stable. */
   tooltipSlotProps: TooltipProps['slotProps']
 }
+
+const SIDEBAR_MIN_WIDTH = 180
+const SIDEBAR_MAX_WIDTH = 480
+const SIDEBAR_DEFAULT_WIDTH = 250
+const SIDEBAR_COLLAPSED_WIDTH = 80
 
 const sections: SidebarSectionConfig[] = [
   {
@@ -123,50 +128,52 @@ const buildTooltipSlotProps = (
  */
 const buildMenuItemStyles = (
   colors: ColorTokens,
-  isCollapsed: boolean
-): MenuItemStyles => ({
-  button: {
-    padding: isCollapsed ? '8px 0' : '5px 35px 5px 20px',
-    justifyContent: isCollapsed ? 'center' : 'flex-start',
-    margin: isCollapsed ? '4px 8px' : '4px 12px',
-    borderRadius: '10px',
-    boxSizing: 'border-box',
-    color: colors.grey[100],
-    backgroundColor: 'transparent',
-    transition: 'background-color 120ms ease, color 120ms ease',
-    // react-pro-sidebar injects inline padding styles that take precedence;
-    // !important is the only reliable way to override them when collapsed.
-    ...(isCollapsed && {
-      paddingLeft: '0 !important',
-      paddingRight: '0 !important',
-    }),
-    '&:hover': {
-      // 1F ≈ 12 % opacity — subtle highlight without washing out the icon colour
-      backgroundColor: `${colors.blueAccent[500]}1F`,
-      color: `${colors.blueAccent[400]} !important`,
+  isCollapsed: boolean,
+  sidebarWidth: number
+): MenuItemStyles => {
+  // Scale left padding proportionally to sidebar width (clamped to a sensible range)
+  const dynamicPaddingLeft = Math.round(sidebarWidth * 0.07)
+
+  return {
+    button: {
+      padding: isCollapsed ? '8px 0' : `5px 20px 5px ${dynamicPaddingLeft}px`,
+      justifyContent: isCollapsed ? 'center' : 'flex-start',
+      margin: isCollapsed ? '4px 8px' : '4px 12px',
+      borderRadius: '10px',
+      boxSizing: 'border-box',
+      color: colors.grey[100],
+      backgroundColor: 'transparent',
+      transition: 'background-color 120ms ease, color 120ms ease',
+      // react-pro-sidebar injects inline padding styles that take precedence;
+      // !important is the only reliable way to override them.
+      paddingLeft: isCollapsed ? '0 !important' : `${dynamicPaddingLeft}px !important`,
+      paddingRight: isCollapsed ? '0 !important' : '20px !important',
+      '&:hover': {
+        // 1F ≈ 12 % opacity — subtle highlight without washing out the icon colour
+        backgroundColor: `${colors.blueAccent[500]}1F`,
+        color: `${colors.blueAccent[400]} !important`,
+      },
+      [`&.${menuClasses.active}`]: {
+        // 30 ≈ 19 % opacity — stronger fill for the active item
+        backgroundColor: `${colors.blueAccent[500]}30`,
+        color: `${colors.blueAccent[500]} !important`,
+        // Use an inset box-shadow to simulate a border without affecting layout.
+        // Collapsed: full outline ring; expanded: left-edge accent strip.
+        boxShadow: `inset 0 0 0 2px ${colors.blueAccent[500]}`,
+      },
     },
-    [`&.${menuClasses.active}`]: {
-      // 30 ≈ 19 % opacity — stronger fill for the active item
-      backgroundColor: `${colors.blueAccent[500]}30`,
-      color: `${colors.blueAccent[500]} !important`,
-      // Use an inset box-shadow to simulate a border without affecting layout.
-      // Collapsed: full outline ring; expanded: left-edge accent strip.
-      ...(isCollapsed
-        ? { boxShadow: `inset 0 0 0 2px ${colors.blueAccent[500]}` }
-        : { boxShadow: `inset 3px 0 0 ${colors.blueAccent[500]}` }),
+    icon: {
+      marginRight: isCollapsed ? '0 !important' : undefined,
+      minWidth: isCollapsed ? '100%' : undefined,
+      width: isCollapsed ? '100%' : undefined,
+      display: 'flex',
+      justifyContent: 'center',
     },
-  },
-  icon: {
-    marginRight: isCollapsed ? '0 !important' : undefined,
-    minWidth: isCollapsed ? '100%' : undefined,
-    width: isCollapsed ? '100%' : undefined,
-    display: 'flex',
-    justifyContent: 'center',
-  },
-  label: {
-    display: isCollapsed ? 'none' : undefined,
-  },
-})
+    label: {
+      display: isCollapsed ? 'none' : undefined,
+    },
+  }
+}
 
 /**
  * Builds the `rootStyles` object for the `ProSidebar` container.
@@ -279,7 +286,42 @@ const Sidebar = () => {
   const { pathname } = useLocation();
   const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode]);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH)
+  const isResizingRef = useRef(false)
+  const startXRef = useRef(0)
+  const startWidthRef = useRef(SIDEBAR_DEFAULT_WIDTH)
   const handleToggleSidebar = useCallback(() => setIsCollapsed((prev) => !prev), [])
+
+  const handleResizeStart = useCallback(
+    (e: React.MouseEvent) => {
+      isResizingRef.current = true
+      startXRef.current = e.clientX
+      startWidthRef.current = sidebarWidth
+      e.preventDefault()
+    },
+    [sidebarWidth]
+  )
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizingRef.current) return
+      const delta = e.clientX - startXRef.current
+      const newWidth = Math.min(
+        SIDEBAR_MAX_WIDTH,
+        Math.max(SIDEBAR_MIN_WIDTH, startWidthRef.current + delta)
+      )
+      setSidebarWidth(newWidth)
+    }
+    const handleMouseUp = () => {
+      isResizingRef.current = false
+    }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [])
 
   // Memoised to keep the object reference stable across renders.
   // A new object on every render would cause Emotion to re-hash the styles unnecessarily.
@@ -289,10 +331,10 @@ const Sidebar = () => {
   )
 
   // Memoised to avoid recalculating CSS strings on every render; only changes
-  // when the colour theme or collapse state actually changes.
+  // when the colour theme, collapse state, or sidebar width changes.
   const menuItemStyles = useMemo(
-    () => buildMenuItemStyles(colors, isCollapsed),
-    [colors, isCollapsed]
+    () => buildMenuItemStyles(colors, isCollapsed, sidebarWidth),
+    [colors, isCollapsed, sidebarWidth]
   )
 
   // Memoised for the same reason — rootStyles only depends on the colour theme.
@@ -304,11 +346,11 @@ const Sidebar = () => {
   return (
     // The Box wrapper is intentional — it prevents ProSidebar from being a direct flex
     // child of .app, which would clamp its height to 100vh and break internal scrolling.
-    <Box>
+    <Box sx={{ position: 'relative' }}>
       <ProSidebar
         collapsed={isCollapsed}
-        width="280px"
-        collapsedWidth="80px"
+        width={`${sidebarWidth}px`}
+        collapsedWidth={`${SIDEBAR_COLLAPSED_WIDTH}px`}
         rootStyles={rootStyles}
       >
         <Menu menuItemStyles={menuItemStyles}>
@@ -345,29 +387,49 @@ const Sidebar = () => {
 
           {sections.map((section) => (
             <Box key={section.heading ?? section.items[0].to}>
-                {!isCollapsed && section.heading && (
-                  <Typography
-                    variant="h6"
-                    color={colors.grey[300]}
-                    sx={{ m: "15px 0 5px 20px" }}
-                  >
-                    {section.heading}
-                  </Typography>
-                )}
+              {!isCollapsed && section.heading && (
+                <Typography
+                  variant="h6"
+                  color={colors.grey[300]}
+                  sx={{ m: '15px 0 5px 0', pl: `${Math.round(sidebarWidth * 0.07)}px` }}
+                >
+                  {section.heading}
+                </Typography>
+              )}
 
-                {section.items.map((item) => (
-                  <SidebarItem
-                    key={item.to}
-                    item={item}
-                    isCollapsed={isCollapsed}
-                    isActive={isRouteActive(item.to, pathname)}
-                    tooltipSlotProps={tooltipSlotProps}
-                  />
-                ))}
-              </Box>
-            ))}
+              {section.items.map((item) => (
+                <SidebarItem
+                  key={item.to}
+                  item={item}
+                  isCollapsed={isCollapsed}
+                  isActive={isRouteActive(item.to, pathname)}
+                  tooltipSlotProps={tooltipSlotProps}
+                />
+              ))}
+            </Box>
+          ))}
         </Menu>
       </ProSidebar>
+
+      {!isCollapsed && (
+        <Box
+          onMouseDown={handleResizeStart}
+          sx={{
+            position: 'fixed',
+            top: 0,
+            bottom: 0,
+            // Position at the right edge of the sidebar
+            left: `${sidebarWidth - 5}px`,
+            width: '5px',
+            cursor: 'col-resize',
+            zIndex: 10,
+            transition: 'background-color 120ms ease',
+            '&:hover': {
+              backgroundColor: `${colors.blueAccent[500]}80`,
+            },
+          }}
+        />
+      )}
     </Box>
   )
 }
