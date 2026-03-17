@@ -3,7 +3,7 @@ import { ColorModeToggleContext, useColorTheme } from "./theme"
 import Topbar from "./scenes/global/Topbar";
 import { Route, Routes } from 'react-router-dom';
 import Dashboard from './scenes/dashboard';
-import SidebarDrawer from './scenes/global/SidebarDrawer';
+import Sidebar from './scenes/global/Sidebar';
 
 function App() {
   const [theme, colorModeToggle] = useColorTheme();
@@ -13,7 +13,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline /> {/* Applies theme-aware global reset so body/background follow light-dark mode  */}
         <div className="app">
-          <SidebarDrawer />
+          <Sidebar />
           <main className="content">
             <Topbar />
             <Routes>

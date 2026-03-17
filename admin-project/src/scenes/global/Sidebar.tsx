@@ -278,7 +278,7 @@ const SidebarItem = ({
  * Drawer Paper is overridden to `position: relative` so the sidebar
  * lives in the normal document flow instead of being fixed.
  */
-export const SidebarDrawer = () => {
+export const Sidebar = () => {
   const theme = useTheme()
   const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode])
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -314,16 +314,17 @@ export const SidebarDrawer = () => {
             sx: {
               width: currentWidth,
               // Override Drawer's default position:fixed so the sidebar
-              // lives in the normal document flow and scrolls with the page.
+              // participates in the flex layout with its own independent scrollbar.
               position: 'relative',
-              overflow: 'hidden',
+              overflowX: 'hidden',
+              overflowY: 'auto',
               backgroundColor: colors.primary[400],
               borderRight: 'none',
               borderTopRightRadius: '6px',
               borderBottomRightRadius: '6px',
               boxSizing: 'border-box',
               color: colors.grey[100],
-              minHeight: '100vh',
+              height: '100dvh',
             },
           },
         }}
@@ -423,4 +424,4 @@ export const SidebarDrawer = () => {
   )
 }
 
-export default SidebarDrawer
+export default Sidebar

@@ -130,7 +130,7 @@ export const colorTokens = (mode: PaletteMode) => ({
 export const themeSettings = (mode: PaletteMode) => {
   const colors = colorTokens(mode);
   const scrollbarTrack = mode === 'dark' ? colors.primary[500] : colors.grey[900];
-  const scrollbarThumbStart = mode === 'dark' ? colors.primary[400] : colors.grey[600];
+  const scrollbarThumbStart = mode === 'dark' ? colors.primary[400] : colors.grey[700];
   const scrollbarThumbEnd = mode === 'dark' ? colors.blueAccent[600] : colors.grey[400];
   const scrollbarThumbHoverStart = mode === 'dark' ? colors.blueAccent[400] : colors.blueAccent[500];
   const scrollbarThumbHoverEnd = mode === 'dark' ? colors.blueAccent[500] : colors.blueAccent[400];
