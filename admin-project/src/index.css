@@ -1,14 +1,22 @@
 html,
 body,
-#root,
-.app,
-.content {
+#root {
   height: 100%;
-  width: 100%;
+  margin: 0;
   font-family: 'Roboto', sans-serif;
 }
 
+/*
+ * Both .app children (sidebar + content) need to fill the viewport and scroll
+ * independently — without this, the page scrolls as a whole and the sidebar
+ * drifts out of view.
+ */
 .app {
   display: flex;
-  position: relative;
+  height: 100dvh;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
 }

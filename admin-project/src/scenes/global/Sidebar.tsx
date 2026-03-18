@@ -299,22 +299,21 @@ export const Sidebar = () => {
   const currentWidth = isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : sidebarWidth
 
   return (
-    // Relative container anchors the resize handle inside the same stacking context.
-    <Box sx={{ position: 'relative' }}>
+    <Box sx={{ display: 'flex', flexShrink: 0 }}>
       {/*
-        variant="permanent" renders only the Paper (no backdrop/portal).
-        Paper position is overridden to relative so it participates
-        in the flex layout instead of being fixed-positioned.
+        variant="permanent" keeps the Drawer in the DOM without a backdrop.
+        position: relative overrides Drawer's default fixed positioning so
+        it participates in the .app flex layout instead of overlapping content.
+        display: flex is needed because the Drawer's internal wrapper doesn't
+        stretch to fill the parent height by default.
       */}
       <Drawer
         variant="permanent"
-        sx={{ width: currentWidth, flexShrink: 0 }}
+        sx={{ width: currentWidth, flexShrink: 0, display: 'flex' }}
         slotProps={{
           paper: {
             sx: {
               width: currentWidth,
-              // Override Drawer's default position:fixed so the sidebar
-              // participates in the flex layout with its own independent scrollbar.
               position: 'relative',
               overflowX: 'hidden',
               overflowY: 'auto',
@@ -324,7 +323,6 @@ export const Sidebar = () => {
               borderBottomRightRadius: '6px',
               boxSizing: 'border-box',
               color: colors.grey[100],
-              height: '100dvh',
             },
           },
         }}
