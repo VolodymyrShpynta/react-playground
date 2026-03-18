@@ -4,6 +4,7 @@ import Topbar from "./scenes/global/Topbar";
 import { Route, Routes } from 'react-router-dom';
 import Dashboard from './scenes/dashboard';
 import Sidebar from './scenes/global/Sidebar';
+import Team from './scenes/team';
 
 function App() {
   const [theme, colorModeToggle] = useColorTheme();
@@ -18,7 +19,7 @@ function App() {
             <Topbar />
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              {/* <Route path="/team" element={<Team />} /> */}
+              <Route path="/team" element={<Team />} />
               {/* <Route path="/contacts" element={<Contacts />} /> */}
               {/* <Route path="/invoices" element={<Invoices />} /> */}
               {/* <Route path="/form" element={<Form />} /> */}

@@ -214,6 +214,34 @@ export const themeSettings = (mode: PaletteMode) => {
           },
         },
       },
+      // ---------------------------------------------------------------------------
+      // DataGrid — global overrides so every grid in the app shares a consistent
+      // borderless look. Per-page tweaks (e.g. custom cell colours) should go in
+      // the component's own `sx`.
+      // ---------------------------------------------------------------------------
+      MuiDataGrid: {
+        styleOverrides: {
+          root: {
+            border: 'none',
+            backgroundColor: colors.primary[400],
+          },
+          cell: {
+            borderBottom: 'none',
+          },
+          // Row background — uses the primary palette so rows blend with the
+          // page background while the header/footer stand out.
+          row: {
+            backgroundColor: colors.primary[400],
+          },
+          columnHeader: {
+            backgroundColor: colors.blueAccent[700],
+          },
+          footerContainer: {
+            borderTop: 'none',
+            backgroundColor: colors.blueAccent[700],
+          },
+        },
+      },
     },
   };
 };
