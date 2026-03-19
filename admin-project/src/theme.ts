@@ -1,5 +1,5 @@
 import { createContext, useState, useMemo } from "react";
-import { createTheme } from "@mui/material/styles";
+import { alpha, createTheme } from "@mui/material/styles";
 import type { PaletteMode } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 
@@ -232,6 +232,15 @@ export const themeSettings = (mode: PaletteMode) => {
           // page background while the header/footer stand out.
           row: {
             backgroundColor: colors.primary[400],
+            '&:hover': {
+              backgroundColor: alpha(colors.blueAccent[600], 0.3),
+            },
+            '&.Mui-selected': {
+              backgroundColor: colors.blueAccent[800],
+              '&:hover': {
+                backgroundColor: alpha(colors.blueAccent[500], 0.4),
+              },
+            },
           },
           columnHeader: {
             backgroundColor: colors.blueAccent[700],
@@ -239,6 +248,12 @@ export const themeSettings = (mode: PaletteMode) => {
           footerContainer: {
             borderTop: 'none',
             backgroundColor: colors.blueAccent[700],
+          },
+          checkboxInput: {
+            color: colors.greenAccent[200],
+            '&.Mui-checked': {
+              color: colors.greenAccent[400],
+            },
           },
         },
       },
