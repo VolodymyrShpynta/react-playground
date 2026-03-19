@@ -83,7 +83,7 @@ export const colorTokens = (mode: PaletteMode) => ({
         100: "#040509",
         200: "#080b12",
         300: "#0c101b",
-        400: "#f2f0f0", // manually changed
+        400: "#101624",
         500: "#141b2d",
         600: "#1F2A40",
         700: "#727681",
@@ -120,8 +120,8 @@ export const colorTokens = (mode: PaletteMode) => ({
         500: "#6870fa",
         600: "#868dfb",
         700: "#a4a9fc",
-        800: "#c3c6fd",
-        900: "#e1e2fe",
+        800: "#ededf7",
+        900: "#f9f8ff",
       },
     }),
 });
@@ -129,11 +129,18 @@ export const colorTokens = (mode: PaletteMode) => ({
 // mui theme settings
 export const themeSettings = (mode: PaletteMode) => {
   const colors = colorTokens(mode);
-  const scrollbarTrack = mode === 'dark' ? colors.primary[500] : colors.grey[900];
-  const scrollbarThumbStart = mode === 'dark' ? colors.primary[400] : colors.grey[700];
-  const scrollbarThumbEnd = mode === 'dark' ? colors.blueAccent[600] : colors.grey[400];
-  const scrollbarThumbHoverStart = mode === 'dark' ? colors.blueAccent[400] : colors.blueAccent[500];
-  const scrollbarThumbHoverEnd = mode === 'dark' ? colors.blueAccent[500] : colors.blueAccent[400];
+  const isDarkMode = mode === 'dark';
+
+  // Semantic color mapping — picks the right shade per mode so components
+  // don't need conditionals. This is the single place for mode-aware logic.
+  const surface = isDarkMode ? colors.primary[400] : colors.blueAccent[900];
+  const gridHeader = isDarkMode ? colors.blueAccent[700] : colors.blueAccent[800];
+
+  const scrollbarTrack = isDarkMode ? colors.primary[500] : colors.grey[900];
+  const scrollbarThumbStart = isDarkMode ? colors.primary[400] : colors.grey[700];
+  const scrollbarThumbEnd = isDarkMode ? colors.blueAccent[600] : colors.grey[400];
+  const scrollbarThumbHoverStart = isDarkMode ? colors.blueAccent[400] : colors.blueAccent[500];
+  const scrollbarThumbHoverEnd = isDarkMode ? colors.blueAccent[500] : colors.blueAccent[400];
 
   return {
     palette: {
@@ -154,6 +161,7 @@ export const themeSettings = (mode: PaletteMode) => {
           },
           background: {
             default: colors.primary[500],
+            paper: surface,
           },
         }
         : {
@@ -170,7 +178,7 @@ export const themeSettings = (mode: PaletteMode) => {
             light: colors.grey[100],
           },
           background: {
-            default: "#fcfcfc",
+            paper: surface,
           },
         }),
     },
@@ -223,31 +231,31 @@ export const themeSettings = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             border: 'none',
-            backgroundColor: colors.primary[400],
+            backgroundColor: surface,
           },
           cell: {
             borderBottom: 'none',
           },
-          // Row background — uses the primary palette so rows blend with the
+          // Row background — uses the surface color so rows blend with the
           // page background while the header/footer stand out.
           row: {
-            backgroundColor: colors.primary[400],
+            backgroundColor: surface,
             '&:hover': {
-              backgroundColor: alpha(colors.blueAccent[600], 0.3),
+              backgroundColor: alpha(colors.blueAccent[600], 0.15),
             },
             '&.Mui-selected': {
-              backgroundColor: colors.blueAccent[800],
+              backgroundColor: alpha(colors.blueAccent[600], 0.22),
               '&:hover': {
-                backgroundColor: alpha(colors.blueAccent[500], 0.4),
+                backgroundColor: alpha(colors.blueAccent[500], 0.3),
               },
             },
           },
           columnHeader: {
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: gridHeader,
           },
           footerContainer: {
             borderTop: 'none',
-            backgroundColor: colors.blueAccent[700],
+            backgroundColor: gridHeader,
           },
           checkboxInput: {
             color: colors.greenAccent[200],

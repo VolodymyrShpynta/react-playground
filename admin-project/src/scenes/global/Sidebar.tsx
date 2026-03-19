@@ -142,7 +142,7 @@ const buildTooltipSlotProps = (
       lineHeight: 1.35,
       px: 1.5,
       py: 1,
-      backgroundColor: colors.primary[400],
+      backgroundColor: theme.palette.background.paper,
       color: colors.grey[100],
       border: `1px solid ${colors.blueAccent[500]}`,
       boxShadow: `0 8px 24px ${alpha(colors.primary[900], 0.4)}`,
@@ -150,7 +150,7 @@ const buildTooltipSlotProps = (
   },
   arrow: {
     sx: {
-      color: colors.primary[400],
+      color: theme.palette.background.paper,
       '&::before': {
         boxSizing: 'border-box',
         border: `1px solid ${colors.blueAccent[500]}`,
@@ -223,11 +223,11 @@ const SidebarItem = ({
         },
         // NavLink adds .active when this route is current
         '&.active': {
-          backgroundColor: alpha(colors.blueAccent[500], 0.19),
-          color: colors.blueAccent[500],
-          boxShadow: `inset 0 0 0 2px ${colors.blueAccent[500]}`,
+          backgroundColor: alpha(colors.blueAccent[500], 0.14),
+          color: colors.blueAccent[400],
+          boxShadow: `inset 0 0 0 1.5px ${alpha(colors.blueAccent[500], 0.4)}`,
           '&:hover': {
-            backgroundColor: alpha(colors.blueAccent[500], 0.25),
+            backgroundColor: alpha(colors.blueAccent[500], 0.2),
           },
         },
       }}
@@ -317,7 +317,7 @@ export const Sidebar = () => {
               position: 'relative',
               overflowX: 'hidden',
               overflowY: 'auto',
-              backgroundColor: colors.primary[400],
+              backgroundColor: theme.palette.background.paper,
               borderRight: 'none',
               borderTopRightRadius: '6px',
               borderBottomRightRadius: '6px',

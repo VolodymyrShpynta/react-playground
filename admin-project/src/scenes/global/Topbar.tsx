@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Box, IconButton, InputBase, useTheme } from "@mui/material";
-import { colorTokens, ColorModeToggleContext } from "../../theme";
+import { ColorModeToggleContext } from "../../theme";
 import SearchIcon from '@mui/icons-material/Search';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
@@ -10,7 +10,6 @@ import PersonIcon from '@mui/icons-material/Person';
 
 const Topbar = () => {
   const theme = useTheme();
-  const colors = colorTokens(theme.palette.mode);
   const colorModeToggle = useContext(ColorModeToggleContext);
 
   return (
@@ -19,7 +18,7 @@ const Topbar = () => {
       <Box
         display="flex"
         sx={{
-          backgroundColor: colors.primary[400],
+          backgroundColor: theme.palette.background.paper,
           borderRadius: "3px"
         }}>
         <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
