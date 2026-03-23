@@ -1,7 +1,5 @@
 import { Box, Typography, useTheme } from "@mui/material";
-import { useMemo } from "react";
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { colorTokens } from "../../theme";
 import { Header } from "../../components/Header";
 import { mockDataTeam } from "../../data/mockData";
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -10,7 +8,6 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 const Team = () => {
   const theme = useTheme();
-  const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode]);
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID" },
@@ -33,14 +30,14 @@ const Team = () => {
               justifyContent: 'center',
               alignItems: 'center',
               backgroundColor:
-                access === 'admin' ? colors.greenAccent[600] : colors.greenAccent[700],
+                access === 'admin' ? theme.palette.secondary.dark : theme.palette.secondary.darker,
               borderRadius: '4px',
             }}
           >
             {access === 'admin' && <AdminPanelSettingsIcon />}
             {access === 'manager' && <SecurityIcon />}
             {access === 'user' && <LockOpenIcon />}
-            <Typography color={colors.grey[100]} sx={{ ml: '5px' }}>
+            <Typography color="text.primary" sx={{ ml: '5px' }}>
               {access}
             </Typography>
           </Box>
@@ -55,7 +52,7 @@ const Team = () => {
       <Box
         sx={{
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: 'secondary.lighter',
           },
         }}
       >

@@ -18,7 +18,7 @@ const Topbar = () => {
       <Box
         display="flex"
         sx={{
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: 'background.paper',
           borderRadius: "3px"
         }}>
         <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />

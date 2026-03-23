@@ -1,14 +1,9 @@
-import { Box, useTheme } from "@mui/material";
-import { useMemo } from "react";
+import { Box } from "@mui/material";
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { colorTokens } from "../../theme";
 import { Header } from "../../components/Header";
 import { mockDataContacts } from "../../data/mockData";
 
 const Contacts = () => {
-  const theme = useTheme();
-  const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode]);
-
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", flex: 0.5 },
     { field: "registrarId", headerName: "Registrar ID" },
@@ -27,7 +22,7 @@ const Contacts = () => {
       <Box
         sx={{
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: 'secondary.lighter',
           },
         }}
       >

@@ -3,184 +3,142 @@ import { alpha, createTheme } from "@mui/material/styles";
 import type { PaletteMode } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 
+// ---------------------------------------------------------------------------
+// TypeScript augmentation — extend MUI's palette types with custom semantic
+// slots so components reference intent, not specific colour shades.
+// ---------------------------------------------------------------------------
+declare module '@mui/material/styles' {
+  interface PaletteColor {
+    lighter: string
+    darker: string
+  }
+  interface SimplePaletteColorOptions {
+    lighter?: string
+    darker?: string
+  }
+}
+
 interface ColorModeToggle {
   toggleColorMode: () => void;
 }
 
-// color design tokens export
-export const colorTokens = (mode: PaletteMode) => ({
-  ...(mode === "dark"
-    ? {
-      grey: {
-        100: "#e0e0e0",
-        200: "#c2c2c2",
-        300: "#a3a3a3",
-        400: "#858585",
-        500: "#666666",
-        600: "#525252",
-        700: "#3d3d3d",
-        800: "#292929",
-        900: "#141414",
-      },
-      primary: {
-        100: "#d0d1d5",
-        200: "#a1a4ab",
-        300: "#727681",
-        400: "#1F2A40",
-        500: "#141b2d",
-        600: "#101624",
-        700: "#0c101b",
-        800: "#080b12",
-        900: "#040509",
-      },
-      greenAccent: {
-        100: "#dbf5ee",
-        200: "#b7ebde",
-        300: "#94e2cd",
-        400: "#70d8bd",
-        500: "#4cceac",
-        600: "#3da58a",
-        700: "#2e7c67",
-        800: "#1e5245",
-        900: "#0f2922",
-      },
-      redAccent: {
-        100: "#f8dcdb",
-        200: "#f1b9b7",
-        300: "#e99592",
-        400: "#e2726e",
-        500: "#db4f4a",
-        600: "#af3f3b",
-        700: "#832f2c",
-        800: "#58201e",
-        900: "#2c100f",
-      },
-      blueAccent: {
-        100: "#e1e2fe",
-        200: "#c3c6fd",
-        300: "#a4a9fc",
-        400: "#868dfb",
-        500: "#6870fa",
-        600: "#535ac8",
-        700: "#3e4396",
-        800: "#2a2d64",
-        900: "#151632",
-      },
-    }
-    : {
-      grey: {
-        100: "#141414",
-        200: "#292929",
-        300: "#3d3d3d",
-        400: "#525252",
-        500: "#666666",
-        600: "#858585",
-        700: "#a3a3a3",
-        800: "#c2c2c2",
-        900: "#e0e0e0",
-      },
-      primary: {
-        100: "#040509",
-        200: "#080b12",
-        300: "#0c101b",
-        400: "#101624",
-        500: "#141b2d",
-        600: "#1F2A40",
-        700: "#727681",
-        800: "#a1a4ab",
-        900: "#d0d1d5",
-      },
-      greenAccent: {
-        100: "#0f2922",
-        200: "#1e5245",
-        300: "#2e7c67",
-        400: "#3da58a",
-        500: "#4cceac",
-        600: "#70d8bd",
-        700: "#94e2cd",
-        800: "#b7ebde",
-        900: "#dbf5ee",
-      },
-      redAccent: {
-        100: "#2c100f",
-        200: "#58201e",
-        300: "#832f2c",
-        400: "#af3f3b",
-        500: "#db4f4a",
-        600: "#e2726e",
-        700: "#e99592",
-        800: "#f1b9b7",
-        900: "#f8dcdb",
-      },
-      blueAccent: {
-        100: "#151632",
-        200: "#2a2d64",
-        300: "#3e4396",
-        400: "#535ac8",
-        500: "#6870fa",
-        600: "#868dfb",
-        700: "#a4a9fc",
-        800: "#ededf7",
-        900: "#f9f8ff",
-      },
-    }),
-});
+// ---------------------------------------------------------------------------
+// Color scales — each defined once, lightest → darkest.
+// themeSettings picks different shades per mode from these static scales.
+// ---------------------------------------------------------------------------
+
+const grey = {
+  100: '#e0e0e0',
+  200: '#c2c2c2',
+  300: '#a3a3a3',
+  400: '#858585',
+  500: '#666666',
+  600: '#525252',
+  700: '#3d3d3d',
+  800: '#292929',
+  900: '#141414',
+} as const
+
+const navy = {
+  100: '#d0d1d5',
+  200: '#a1a4ab',
+  300: '#727681',
+  400: '#1F2A40',
+  500: '#141b2d',
+  600: '#101624',
+  700: '#0c101b',
+  800: '#080b12',
+  900: '#040509',
+} as const
+
+const greenAccent = {
+  100: '#dbf5ee',
+  200: '#b7ebde',
+  300: '#94e2cd',
+  400: '#70d8bd',
+  500: '#4cceac',
+  600: '#3da58a',
+  700: '#2e7c67',
+  800: '#1e5245',
+  900: '#0f2922',
+} as const
+
+const redAccent = {
+  100: '#f8dcdb',
+  200: '#f1b9b7',
+  300: '#e99592',
+  400: '#e2726e',
+  500: '#db4f4a',
+  600: '#af3f3b',
+  700: '#832f2c',
+  800: '#58201e',
+  900: '#2c100f',
+} as const
+
+const blueAccent = {
+  50: '#f9f8ff',
+  75: '#ededf7',
+  100: '#e1e2fe',
+  200: '#c3c6fd',
+  300: '#a4a9fc',
+  400: '#868dfb',
+  500: '#6870fa',
+  600: '#535ac8',
+  700: '#3e4396',
+  800: '#2a2d64',
+  900: '#151632',
+} as const
+
+// Exported for non-component consumers (e.g. static chart data) that can't
+// access the theme via hooks.
+export const colors = { grey, navy, greenAccent, redAccent, blueAccent } as const
 
 // mui theme settings
 export const themeSettings = (mode: PaletteMode) => {
-  const colors = colorTokens(mode);
   const isDarkMode = mode === 'dark';
 
-  // Semantic color mapping — picks the right shade per mode so components
-  // don't need conditionals. This is the single place for mode-aware logic.
-  const surface = isDarkMode ? colors.primary[400] : colors.blueAccent[900];
-  const gridHeader = isDarkMode ? colors.blueAccent[700] : colors.blueAccent[800];
+  // Derived colors reused by multiple component overrides below.
+  const paperBg = isDarkMode ? navy[400] : blueAccent[50];
+  const gridHeader = isDarkMode ? blueAccent[700] : blueAccent[75];
 
-  const scrollbarTrack = isDarkMode ? colors.primary[500] : colors.grey[900];
-  const scrollbarThumbStart = isDarkMode ? colors.primary[400] : colors.grey[700];
-  const scrollbarThumbEnd = isDarkMode ? colors.blueAccent[600] : colors.grey[400];
-  const scrollbarThumbHoverStart = isDarkMode ? colors.blueAccent[400] : colors.blueAccent[500];
-  const scrollbarThumbHoverEnd = isDarkMode ? colors.blueAccent[500] : colors.blueAccent[400];
+  const scrollbarTrack = isDarkMode ? navy[500] : grey[100];
+  const scrollbarThumbStart = isDarkMode ? navy[400] : grey[300];
+  const scrollbarThumbEnd = isDarkMode ? blueAccent[600] : grey[600];
+  const scrollbarThumbHoverStart = isDarkMode ? blueAccent[400] : blueAccent[500];
+  const scrollbarThumbHoverEnd = isDarkMode ? blueAccent[500] : blueAccent[600];
 
   return {
     palette: {
       mode: mode,
-      ...(mode === "dark"
-        ? {
-          // palette values for dark mode
-          primary: {
-            main: colors.primary[500],
-          },
-          secondary: {
-            main: colors.greenAccent[500],
-          },
-          neutral: {
-            dark: colors.grey[700],
-            main: colors.grey[500],
-            light: colors.grey[100],
-          },
-          background: {
-            default: colors.primary[500],
-            paper: surface,
-          },
-        }
-        : {
-          // palette values for light mode
-          primary: {
-            main: colors.primary[100],
-          },
-          secondary: {
-            main: colors.greenAccent[500],
-          },
-          neutral: {
-            dark: colors.grey[700],
-            main: colors.grey[500],
-            light: colors.grey[100],
-          },
-          background: {
-            paper: surface,
-          },
-        }),
+      primary: {
+        main: isDarkMode ? navy[500] : navy[900],
+      },
+      secondary: {
+        lighter: isDarkMode ? greenAccent[300] : greenAccent[700],
+        light: isDarkMode ? greenAccent[400] : greenAccent[600],
+        main: greenAccent[500],
+        dark: isDarkMode ? greenAccent[600] : greenAccent[400],
+        darker: isDarkMode ? greenAccent[700] : greenAccent[300],
+      },
+      info: {
+        light: isDarkMode ? blueAccent[400] : blueAccent[600],
+        main: blueAccent[500],
+        dark: isDarkMode ? blueAccent[700] : blueAccent[300],
+      },
+      error: {
+        main: redAccent[500],
+      },
+      text: {
+        primary: isDarkMode ? grey[100] : grey[900],
+        secondary: isDarkMode ? grey[300] : grey[700],
+      },
+      background: {
+        // Light mode: omit `default` so MUI uses its built-in white.
+        // Setting it to `undefined` explicitly would override MUI's default
+        // and crash components that call alpha() on background.default.
+        ...(isDarkMode && { default: navy[500] }),
+        paper: paperBg,
+      },
     },
     typography: {
       fontFamily: 'Roboto, sans-serif',
@@ -231,22 +189,22 @@ export const themeSettings = (mode: PaletteMode) => {
         styleOverrides: {
           root: {
             border: 'none',
-            backgroundColor: surface,
+            backgroundColor: paperBg,
           },
           cell: {
             borderBottom: 'none',
           },
-          // Row background — uses the surface color so rows blend with the
+          // Row background — uses paperBg so rows blend with the
           // page background while the header/footer stand out.
           row: {
-            backgroundColor: surface,
+            backgroundColor: paperBg,
             '&:hover': {
-              backgroundColor: alpha(colors.blueAccent[600], 0.15),
+              backgroundColor: alpha(isDarkMode ? blueAccent[600] : blueAccent[400], 0.15),
             },
             '&.Mui-selected': {
-              backgroundColor: alpha(colors.blueAccent[600], 0.22),
+              backgroundColor: alpha(isDarkMode ? blueAccent[600] : blueAccent[400], 0.22),
               '&:hover': {
-                backgroundColor: alpha(colors.blueAccent[500], 0.3),
+                backgroundColor: alpha(blueAccent[500], 0.3),
               },
             },
           },
@@ -258,9 +216,9 @@ export const themeSettings = (mode: PaletteMode) => {
             backgroundColor: gridHeader,
           },
           checkboxInput: {
-            color: colors.greenAccent[200],
+            color: isDarkMode ? greenAccent[200] : greenAccent[800],
             '&.Mui-checked': {
-              color: colors.greenAccent[400],
+              color: isDarkMode ? greenAccent[400] : greenAccent[600],
             },
           },
         },

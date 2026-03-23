@@ -1,14 +1,9 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { useMemo } from "react";
+import { Box, Typography } from "@mui/material";
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
-import { colorTokens } from "../../theme";
 import { Header } from "../../components/Header";
 import { mockDataInvoices } from "../../data/mockData";
 
 const Invoices = () => {
-  const theme = useTheme();
-  const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode]);
-
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID" },
     { field: "name", headerName: "Name", flex: 1, cellClassName: "name-column--cell" },
@@ -19,7 +14,7 @@ const Invoices = () => {
       headerName: "Cost",
       flex: 1,
       renderCell: (params) => (
-        <Typography sx={{ color: colors.greenAccent[400], display: 'flex', alignItems: 'center', height: '100%' }}>
+        <Typography sx={{ color: 'secondary.light', display: 'flex', alignItems: 'center', height: '100%' }}>
           ${params.row.cost}
         </Typography>
       ),
@@ -33,7 +28,7 @@ const Invoices = () => {
       <Box
         sx={{
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: 'secondary.lighter',
           },
         }}
       >

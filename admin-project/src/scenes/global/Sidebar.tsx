@@ -12,7 +12,6 @@ import {
   Typography,
   type TooltipProps,
 } from '@mui/material'
-import { colorTokens } from '../../theme'
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useResizable } from '../../components/useResizable'
 import { NavLink } from 'react-router-dom'
@@ -47,16 +46,9 @@ interface SidebarSectionConfig {
 interface SidebarItemProps {
   item: SidebarItemConfig
   isCollapsed: boolean
-  colors: ColorTokens
   dynamicPaddingLeft: number
   tooltipSlotProps: TooltipProps['slotProps']
 }
-
-interface SidebarUserProfileProps {
-  colors: ColorTokens
-}
-
-type ColorTokens = ReturnType<typeof colorTokens>
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -130,7 +122,6 @@ const NavListItemButton = ListItemButton as React.ComponentType<NavListItemButto
  * concise and the object reference stays stable.
  */
 const buildTooltipSlotProps = (
-  colors: ColorTokens,
   theme: Theme
 ): TooltipProps['slotProps'] => ({
   tooltip: {
@@ -142,18 +133,18 @@ const buildTooltipSlotProps = (
       lineHeight: 1.35,
       px: 1.5,
       py: 1,
-      backgroundColor: theme.palette.background.paper,
-      color: colors.grey[100],
-      border: `1px solid ${colors.blueAccent[500]}`,
-      boxShadow: `0 8px 24px ${alpha(colors.primary[900], 0.4)}`,
+      backgroundColor: 'background.paper',
+      color: 'text.primary',
+      border: `1px solid ${theme.palette.info.main}`,
+      boxShadow: `0 8px 24px ${alpha(theme.palette.common.black, 0.4)}`,
     },
   },
   arrow: {
     sx: {
-      color: theme.palette.background.paper,
+      color: 'background.paper',
       '&::before': {
         boxSizing: 'border-box',
-        border: `1px solid ${colors.blueAccent[500]}`,
+        border: `1px solid ${theme.palette.info.main}`,
       },
     },
   },
@@ -164,25 +155,27 @@ const buildTooltipSlotProps = (
 // ---------------------------------------------------------------------------
 
 /** Avatar, name, and role displayed below the header when expanded. */
-const SidebarUserProfile = ({ colors }: SidebarUserProfileProps) => (
-  <Box sx={{ mb: 3 }}>
-    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <Avatar
-        alt="profile-user"
-        src="../../assets/user.png"
-        sx={{ width: 100, height: 100, cursor: 'pointer' }}
-      />
+const SidebarUserProfile = () => {
+  return (
+    <Box sx={{ mb: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Avatar
+          alt="profile-user"
+          src="../../assets/user.png"
+          sx={{ width: 100, height: 100, cursor: 'pointer' }}
+        />
+      </Box>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="h2" color="text.primary" fontWeight="bold" sx={{ mt: 1.25 }}>
+          Ed Roh
+        </Typography>
+        <Typography variant="h5" color="secondary">
+          VP Fancy Admin
+        </Typography>
+      </Box>
     </Box>
-    <Box sx={{ textAlign: 'center' }}>
-      <Typography variant="h2" color={colors.grey[100]} fontWeight="bold" sx={{ mt: 1.25 }}>
-        Ed Roh
-      </Typography>
-      <Typography variant="h5" color={colors.greenAccent[500]}>
-        VP Fancy Admin
-      </Typography>
-    </Box>
-  </Box>
-)
+  )
+}
 
 /**
  * A single nav row using MUI ListItemButton rendered as a NavLink.
@@ -197,10 +190,11 @@ const SidebarUserProfile = ({ colors }: SidebarUserProfileProps) => (
 const SidebarItem = ({
   item,
   isCollapsed,
-  colors,
   dynamicPaddingLeft,
   tooltipSlotProps,
 }: SidebarItemProps) => {
+  const theme = useTheme()
+
   const button = (
     <NavListItemButton
       component={NavLink}
@@ -215,19 +209,19 @@ const SidebarItem = ({
         mx: isCollapsed ? '8px' : '12px',
         borderRadius: '10px',
         justifyContent: isCollapsed ? 'center' : 'flex-start',
-        color: colors.grey[100],
+        color: 'text.primary',
         transition: 'background-color 120ms ease, color 120ms ease',
         '&:hover': {
-          backgroundColor: alpha(colors.blueAccent[500], 0.12),
-          color: colors.blueAccent[400],
+          backgroundColor: alpha(theme.palette.info.main, 0.12),
+          color: 'info.light',
         },
         // NavLink adds .active when this route is current
         '&.active': {
-          backgroundColor: alpha(colors.blueAccent[500], 0.14),
-          color: colors.blueAccent[400],
-          boxShadow: `inset 0 0 0 1.5px ${alpha(colors.blueAccent[500], 0.4)}`,
+          backgroundColor: alpha(theme.palette.info.main, 0.14),
+          color: 'info.light',
+          boxShadow: `inset 0 0 0 1.5px ${alpha(theme.palette.info.main, 0.4)}`,
           '&:hover': {
-            backgroundColor: alpha(colors.blueAccent[500], 0.2),
+            backgroundColor: alpha(theme.palette.info.main, 0.2),
           },
         },
       }}
@@ -280,7 +274,6 @@ const SidebarItem = ({
  */
 export const Sidebar = () => {
   const theme = useTheme()
-  const colors = useMemo(() => colorTokens(theme.palette.mode), [theme.palette.mode])
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { width: sidebarWidth, handleResizeStart } = useResizable({
     defaultWidth: SIDEBAR_DEFAULT_WIDTH,
@@ -291,8 +284,8 @@ export const Sidebar = () => {
   const handleToggleSidebar = useCallback(() => setIsCollapsed((prev) => !prev), [])
 
   const tooltipSlotProps = useMemo(
-    () => buildTooltipSlotProps(colors, theme),
-    [colors, theme]
+    () => buildTooltipSlotProps(theme),
+    [theme]
   )
 
   const dynamicPaddingLeft = Math.round(sidebarWidth * 0.07)
@@ -317,12 +310,12 @@ export const Sidebar = () => {
               position: 'relative',
               overflowX: 'hidden',
               overflowY: 'auto',
-              backgroundColor: theme.palette.background.paper,
+              backgroundColor: 'background.paper',
               borderRight: 'none',
               borderTopRightRadius: '6px',
               borderBottomRightRadius: '6px',
               boxSizing: 'border-box',
-              color: colors.grey[100],
+              color: 'text.primary',
             },
           },
         }}
@@ -337,7 +330,7 @@ export const Sidebar = () => {
           }}
         >
           {isCollapsed ? (
-            <IconButton onClick={handleToggleSidebar} aria-label="Toggle sidebar" sx={{ color: colors.grey[100] }}>
+            <IconButton onClick={handleToggleSidebar} aria-label="Toggle sidebar" sx={{ color: 'text.primary' }}>
               <MenuOutlinedIcon />
             </IconButton>
           ) : (
@@ -350,7 +343,7 @@ export const Sidebar = () => {
                   minWidth: 0,
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  color: colors.grey[100],
+                  color: 'text.primary',
                   ml: '15px',
                 }}
               >
@@ -359,7 +352,7 @@ export const Sidebar = () => {
               <IconButton
                 onClick={handleToggleSidebar}
                 aria-label="Toggle sidebar"
-                sx={{ color: colors.grey[100] }}
+                sx={{ color: 'text.primary' }}
               >
                 <MenuOutlinedIcon />
               </IconButton>
@@ -368,7 +361,7 @@ export const Sidebar = () => {
         </Box>
 
         {/* ── User profile ── */}
-        {!isCollapsed && <SidebarUserProfile colors={colors} />}
+        {!isCollapsed && <SidebarUserProfile />}
 
         {/* ── Navigation ── */}
         <List component="nav" disablePadding>
@@ -377,7 +370,7 @@ export const Sidebar = () => {
               {!isCollapsed && section.heading && (
                 <Typography
                   variant="h6"
-                  color={colors.grey[300]}
+                  color="text.secondary"
                   sx={{ m: '15px 0 5px 0', pl: `${dynamicPaddingLeft}px` }}
                 >
                   {section.heading}
@@ -389,7 +382,6 @@ export const Sidebar = () => {
                   key={item.to}
                   item={item}
                   isCollapsed={isCollapsed}
-                  colors={colors}
                   dynamicPaddingLeft={dynamicPaddingLeft}
                   tooltipSlotProps={tooltipSlotProps}
                 />
@@ -413,7 +405,7 @@ export const Sidebar = () => {
             zIndex: 1201,
             transition: 'background-color 120ms ease',
             '&:hover': {
-              backgroundColor: alpha(colors.blueAccent[500], 0.5),
+              backgroundColor: alpha(theme.palette.info.main, 0.5),
             },
           }}
         />

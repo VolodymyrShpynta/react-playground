@@ -1,5 +1,5 @@
 
-import { colorTokens } from "../theme";
+import { colors } from '../theme'
 
 export const mockDataTeam = [
   {
@@ -431,10 +431,12 @@ export const mockPieData = [
   },
 ];
 
+// Static chart colors — hardcoded to dark-mode values since these are
+// non-theme-aware placeholder data for Nivo charts.
 export const mockLineData = [
   {
     id: "japan",
-    color: colorTokens("dark").greenAccent[500],
+    color: colors.greenAccent[500],
     data: [
       {
         x: "plane",
@@ -488,7 +490,7 @@ export const mockLineData = [
   },
   {
     id: "france",
-    color: colorTokens("dark").blueAccent[300],
+    color: colors.blueAccent[300],
     data: [
       {
         x: "plane",
@@ -542,7 +544,7 @@ export const mockLineData = [
   },
   {
     id: "us",
-    color: colorTokens("dark").redAccent[200],
+    color: colors.redAccent[200],
     data: [
       {
         x: "plane",
