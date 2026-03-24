@@ -1,0 +1,121 @@
+/* ── Teams-style FullCalendar overrides ── */
+
+/* Toolbar */
+.fc .fc-toolbar {
+  padding: 8px 0;
+  margin-bottom: 0 !important;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.1rem !important;
+  font-weight: 500;
+}
+
+.fc .fc-button {
+  border-radius: 4px !important;
+  text-transform: capitalize !important;
+  font-weight: 500 !important;
+  font-size: 0.85rem !important;
+  padding: 4px 12px !important;
+}
+
+/* Border color is set dynamically via inline CSS variable on the container
+   (see calendar.tsx) so it adapts to MUI light/dark mode. */
+
+/* Time-grid: hour rows */
+.fc .fc-timegrid-slot {
+  height: 48px;
+}
+
+.fc .fc-timegrid-slot-label-cushion {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+/* Day headers */
+.fc .fc-col-header-cell {
+  padding: 8px 0;
+  font-weight: 500;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.fc .fc-col-header-cell-cushion {
+  text-decoration: none !important;
+}
+
+/* Today highlight — color set via --fc-today-bg-color on the container */
+.fc .fc-day-today {
+  background: var(--fc-today-bg-color, rgba(104, 112, 250, 0.06)) !important;
+}
+
+/* Events — Teams-like rounded chips */
+.fc .fc-event {
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  border-left: 3px solid currentColor !important;
+}
+
+.fc .fc-timegrid-event {
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.fc .fc-timegrid-event .fc-event-main {
+  padding: 4px 6px;
+}
+
+.fc .fc-timegrid-event .fc-event-title {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.fc .fc-timegrid-event .fc-event-time {
+  font-size: 0.7rem;
+  opacity: 0.85;
+}
+
+/* All-day events row */
+.fc .fc-daygrid-event {
+  border-radius: 4px !important;
+  margin: 1px 2px;
+}
+
+/* Now indicator (red line) — color set via --fc-now-indicator-color on the container */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: var(--fc-now-indicator-color, #db4f4a);
+  border-width: 2px;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: var(--fc-now-indicator-color, #db4f4a);
+}
+
+/* Scrollbar inside the time grid */
+.fc .fc-scroller::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* ── List view overrides ──
+   Background colors are handled by official FC CSS variables set on the
+   container (--fc-neutral-bg-color, --fc-page-bg-color, --fc-list-event-hover-bg-color).
+   Text color cascades from the container's MUI `color: text.primary`.
+   The only override needed is for <a> tags which browsers style with their
+   own link color, breaking color inheritance. */
+
+.fc .fc-list-day-cushion a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+.fc .fc-list-day-text,
+.fc .fc-list-day-side-text {
+  font-weight: 600;
+}
+
+/* Remove list bullet decorations */
+.fc .fc-list-event-dot {
+  border-color: currentColor;
+}

@@ -51,6 +51,13 @@ const AddEventDialogContent = ({
     dayjs(toLocalDateTimeStr(initialEnd)),
   )
 
+  const handleStartChange = (newStart: Dayjs | null) => {
+    setStart(newStart)
+    if (newStart) {
+      setEnd(newStart.add(1, allDay ? 'day' : 'hour'))
+    }
+  }
+
   const handleSubmit = () => {
     const trimmed = title.trim()
     if (!trimmed || !start || !end) return
@@ -106,7 +113,7 @@ const AddEventDialogContent = ({
             <Picker
               label="Start"
               value={start}
-              onChange={setStart}
+              onChange={handleStartChange}
               slotProps={{
                 textField: { fullWidth: true, required: true },
               }}
