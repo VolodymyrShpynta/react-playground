@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import { formatDate } from '@fullcalendar/core'
 import type { DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/core'
@@ -8,44 +8,55 @@ import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import { Box, List, ListItem, ListItemText, Typography } from '@mui/material'
 import { Header } from '../../components/Header'
-import { AddEventDialog } from './AddEventDialog'
+import { AddEventDialog, type EventFormData } from './AddEventDialog'
 import { EventDetailDialog } from './EventDetailDialog'
+
+interface SelectionSnapshot {
+  calendarApi: DateSelectArg['view']['calendar']
+  startStr: string
+  endStr: string
+  allDay: boolean
+}
 
 const Calendar = () => {
   const [currentEvents, setCurrentEvents] = useState<EventApi[]>([])
 
   // --- Add-event dialog state ---
   const [addDialogOpen, setAddDialogOpen] = useState(false)
-  const pendingSelection = useRef<DateSelectArg | null>(null)
+  const [selection, setSelection] = useState<SelectionSnapshot | null>(null)
 
   const handleDateClick = useCallback((selected: DateSelectArg) => {
-    pendingSelection.current = selected
+    setSelection({
+      calendarApi: selected.view.calendar,
+      startStr: selected.startStr,
+      endStr: selected.endStr,
+      allDay: selected.allDay,
+    })
     setAddDialogOpen(true)
   }, [])
 
-  const handleAddEvent = useCallback((title: string) => {
-    const selected = pendingSelection.current
-    if (!selected) return
+  const handleAddEvent = useCallback((data: EventFormData) => {
+    if (!selection) return
 
-    const calendarApi = selected.view.calendar
-    calendarApi.unselect()
-    calendarApi.addEvent({
-      id: `${selected.startStr}-${title}`,
-      title,
-      start: selected.startStr,
-      end: selected.endStr,
-      allDay: selected.allDay,
+    selection.calendarApi.unselect()
+    selection.calendarApi.addEvent({
+      id: `${data.start}-${data.title}`,
+      title: data.title,
+      start: data.start,
+      end: data.end,
+      allDay: data.allDay,
+      extendedProps: { description: data.description },
     })
 
-    pendingSelection.current = null
+    setSelection(null)
     setAddDialogOpen(false)
-  }, [])
+  }, [selection])
 
   const handleAddDialogClose = useCallback(() => {
-    pendingSelection.current?.view.calendar.unselect()
-    pendingSelection.current = null
+    selection?.calendarApi.unselect()
+    setSelection(null)
     setAddDialogOpen(false)
-  }, [])
+  }, [selection])
 
   // --- Event-detail / delete dialog state ---
   const [detailDialogOpen, setDetailDialogOpen] = useState(false)
@@ -112,7 +123,6 @@ const Calendar = () => {
         {/* CALENDAR */}
         <Box flex="1 1 100%" ml="15px">
           <FullCalendar
-            height="75vh"
             plugins={[
               dayGridPlugin,
               timeGridPlugin,
@@ -151,12 +161,15 @@ const Calendar = () => {
       {/* Dialogs */}
       <AddEventDialog
         open={addDialogOpen}
+        initialStart={selection?.startStr ?? ''}
+        initialEnd={selection?.endStr ?? ''}
+        initialAllDay={selection?.allDay ?? true}
         onClose={handleAddDialogClose}
         onAdd={handleAddEvent}
       />
       <EventDetailDialog
         open={detailDialogOpen}
-        eventTitle={clickedEvent?.title ?? ''}
+        event={clickedEvent}
         onClose={handleDetailDialogClose}
         onDelete={handleDeleteEvent}
       />

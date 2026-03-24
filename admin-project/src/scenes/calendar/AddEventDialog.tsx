@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import dayjs, { type Dayjs } from 'dayjs'
 import {
   Box,
   Button,
@@ -6,63 +7,136 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
+  Stack,
+  Switch,
   TextField,
 } from '@mui/material'
+import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
+
+export interface EventFormData {
+  title: string
+  description: string
+  start: string
+  end: string
+  allDay: boolean
+}
 
 interface AddEventDialogProps {
   open: boolean
+  initialStart: string
+  initialEnd: string
+  initialAllDay: boolean
   onClose: () => void
-  onAdd: (title: string) => void
+  onAdd: (data: EventFormData) => void
 }
 
-export const AddEventDialog = ({ open, onClose, onAdd }: AddEventDialogProps) => {
+const toLocalDateTimeStr = (iso: string) =>
+  iso.includes('T') ? iso : `${iso}T00:00`
+
+const AddEventDialogContent = ({
+  initialStart,
+  initialEnd,
+  initialAllDay,
+  onClose,
+  onAdd,
+}: Omit<AddEventDialogProps, 'open'>) => {
   const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [allDay, setAllDay] = useState(initialAllDay)
+  const [start, setStart] = useState<Dayjs | null>(
+    dayjs(toLocalDateTimeStr(initialStart)),
+  )
+  const [end, setEnd] = useState<Dayjs | null>(
+    dayjs(toLocalDateTimeStr(initialEnd)),
+  )
 
   const handleSubmit = () => {
     const trimmed = title.trim()
-    if (!trimmed) return
-    onAdd(trimmed)
-    setTitle('')
+    if (!trimmed || !start || !end) return
+    onAdd({
+      title: trimmed,
+      description: description.trim(),
+      start: allDay ? start.format('YYYY-MM-DD') : start.toISOString(),
+      end: allDay ? end.format('YYYY-MM-DD') : end.toISOString(),
+      allDay,
+    })
   }
 
-  const handleClose = () => {
-    setTitle('')
-    onClose()
-  }
+  const Picker = allDay ? DatePicker : DateTimePicker
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      maxWidth="sm"
+    <Box
+      component="form"
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleSubmit()
+      }}
     >
-      <Box
-        component="form"
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleSubmit()
-        }}
-      >
-        <DialogTitle>Add New Event</DialogTitle>
-        <DialogContent>
+      <DialogTitle>Add New Event</DialogTitle>
+      <DialogContent dividers>
+        <Stack spacing={2} sx={{ mt: 1 }}>
           <TextField
             autoFocus
-            label="Event title"
+            label="Title"
             fullWidth
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            sx={{ mt: 1 }}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
-            Add
-          </Button>
-        </DialogActions>
-      </Box>
-    </Dialog>
+          <TextField
+            label="Description"
+            fullWidth
+            multiline
+            minRows={2}
+            maxRows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={allDay}
+                onChange={(e) => setAllDay(e.target.checked)}
+              />
+            }
+            label="All day"
+          />
+          <Stack spacing={2}>
+            <Picker
+              label="Start"
+              value={start}
+              onChange={setStart}
+              slotProps={{
+                textField: { fullWidth: true, required: true },
+              }}
+            />
+            <Picker
+              label="End"
+              value={end}
+              onChange={setEnd}
+              slotProps={{
+                textField: { fullWidth: true, required: true },
+              }}
+            />
+          </Stack>
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button type="submit" variant="contained">
+          Add
+        </Button>
+      </DialogActions>
+    </Box>
   )
 }
+
+export const AddEventDialog = ({
+  open,
+  ...contentProps
+}: AddEventDialogProps) => (
+  <Dialog open={open} onClose={contentProps.onClose} fullWidth maxWidth="sm">
+    {open && <AddEventDialogContent {...contentProps} />}
+  </Dialog>
+)
