@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import type { CalendarApi, DateSelectArg, EventClickArg, EventApi } from '@fullcalendar/core'
 import dayGridPlugin from '@fullcalendar/daygrid'
@@ -7,7 +7,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
 import dayjs from 'dayjs'
 import AddIcon from '@mui/icons-material/Add'
-import { Box, Button, Divider, Typography, useTheme } from '@mui/material'
+import { Box, Button, Divider, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { DateCalendar } from '@mui/x-date-pickers'
 import { AddEventDialog, type EventFormData } from './AddEventDialog'
 import { EventDetailDialog } from './EventDetailDialog'
@@ -85,16 +85,28 @@ const getInitialEvents = (palette: Theme['palette']) => {
 const Calendar = () => {
   const theme = useTheme()
   const { palette } = theme
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'))
   const calendarRef = useRef<FullCalendar>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [miniDate, setMiniDate] = useState(dayjs())
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(!isSmallScreen)
+  const [isNarrowContainer, setIsNarrowContainer] = useState(false)
 
-  // Re-measure FullCalendar when its container resizes (e.g. app sidebar toggle)
+  // Auto-collapse sidebar when crossing the breakpoint
+  useEffect(() => {
+    const mql = window.matchMedia(theme.breakpoints.down('md').replace('@media ', ''))
+    const handler = (e: MediaQueryListEvent) => setSidebarOpen(!e.matches)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [theme.breakpoints])
+
+  // Track container width + re-measure FullCalendar on resize
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
-    const observer = new ResizeObserver(() => {
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0
+      setIsNarrowContainer(width < 700)
       calendarRef.current?.getApi().updateSize()
     })
     observer.observe(el)
@@ -189,6 +201,32 @@ const Calendar = () => {
     calendarRef.current?.getApi().gotoDate(date.toDate())
   }, [])
 
+  const headerToolbar = useMemo(() => {
+    if (isNarrowContainer) {
+      return {
+        start: 'toggleSidebar prev,next today',
+        center: '',
+        end: 'title',
+      }
+    }
+    return {
+      start: 'toggleSidebar prev,next today',
+      center: 'title',
+      end: 'timeGridWeek,timeGridDay,dayGridMonth,listMonth',
+    }
+  }, [isNarrowContainer])
+
+  const footerToolbar = useMemo(() => {
+    if (isNarrowContainer) {
+      return {
+        start: '',
+        center: 'timeGridWeek,timeGridDay,dayGridMonth,listMonth',
+        end: '',
+      }
+    }
+    return false as const
+  }, [isNarrowContainer])
+
   return (
     <Box sx={{ display: 'flex', height: 'calc(100vh - 64px)' }}>
       {/* ── LEFT SIDEBAR ── */}
@@ -256,11 +294,14 @@ const Calendar = () => {
       {/* ── MAIN CALENDAR ── */}
       <Box
         ref={containerRef}
+        className="calendar-container"
         sx={{
           flex: 1,
           overflow: 'hidden',
           p: 1,
           color: 'text.primary',
+          containerType: 'inline-size',
+          containerName: 'calendar',
         }}
       >
         <Box
@@ -286,11 +327,8 @@ const Calendar = () => {
               click: () => setSidebarOpen((prev) => !prev),
             },
           }}
-          headerToolbar={{
-            start: 'toggleSidebar prev,next today',
-            center: 'title',
-            end: 'timeGridWeek,timeGridDay,dayGridMonth,listMonth',
-          }}
+          headerToolbar={headerToolbar}
+          footerToolbar={footerToolbar}
           initialView="timeGridWeek"
           eventDisplay="block"
           nowIndicator

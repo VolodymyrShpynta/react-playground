@@ -129,3 +129,42 @@
 .fc .fc-list-event-dot {
   border-color: currentColor;
 }
+
+/* ── Responsive: adapt toolbar to narrow calendar container ── */
+
+/* Title should always stay on one line */
+.fc .fc-toolbar-title {
+  white-space: nowrap;
+}
+
+/* The calendar wrapper (.calendar-container) uses container-type: inline-size
+   so these rules fire based on actual container width, not viewport. */
+@container calendar (max-width: 700px) {
+  .fc .fc-toolbar {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .fc .fc-toolbar-title {
+    width: 100%;
+    text-align: center;
+    order: -1;
+    font-size: 1rem !important;
+  }
+
+  .fc .fc-toolbar-chunk {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fc .fc-button {
+    font-size: 0.75rem !important;
+    padding: 3px 8px !important;
+  }
+
+  .fc .fc-col-header-cell {
+    font-size: 0.7rem;
+  }
+}
