@@ -19,6 +19,16 @@
   padding: 4px 12px !important;
 }
 
+/* Sidebar toggle — visually separated from navigation buttons */
+.fc .fc-toggleSidebar-button {
+  margin-right: 12px !important;
+  padding: 4px 6px !important;
+}
+
+.fc .fc-toggleSidebar-button:hover {
+  opacity: 1;
+}
+
 /* Border color is set dynamically via inline CSS variable on the container
    (see calendar.tsx) so it adapts to MUI light/dark mode. */
 

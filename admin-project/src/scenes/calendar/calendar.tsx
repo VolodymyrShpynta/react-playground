@@ -88,6 +88,7 @@ const Calendar = () => {
   const calendarRef = useRef<FullCalendar>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [miniDate, setMiniDate] = useState(dayjs())
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   // Re-measure FullCalendar when its container resizes (e.g. app sidebar toggle)
   useEffect(() => {
@@ -166,6 +167,16 @@ const Calendar = () => {
     setDetailDialogOpen(false)
   }, [clickedEvent])
 
+  const handleUpdateEvent = useCallback((data: EventFormData) => {
+    if (!clickedEvent) return
+    clickedEvent.setProp('title', data.title)
+    clickedEvent.setExtendedProp('description', data.description)
+    clickedEvent.setAllDay(data.allDay)
+    clickedEvent.setDates(data.start, data.end)
+    setClickedEvent(null)
+    setDetailDialogOpen(false)
+  }, [clickedEvent])
+
   const handleDetailDialogClose = useCallback(() => {
     setClickedEvent(null)
     setDetailDialogOpen(false)
@@ -183,15 +194,18 @@ const Calendar = () => {
       {/* ── LEFT SIDEBAR ── */}
       <Box
         sx={{
-          width: 240,
+          width: sidebarOpen ? 240 : 0,
           flexShrink: 0,
-          borderRight: 1,
-          borderLeft: 1,
+          border: sidebarOpen ? 1 : 0,
           borderColor: 'divider',
+          borderRadius: 1,
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: 'background.paper',
-          ml: 1,
+          ml: sidebarOpen ? 1 : 0,
+          my: 1,
+          overflow: 'hidden',
+          transition: 'width 0.2s ease, margin 0.2s ease',
         }}
       >
         <Box sx={{ p: 2 }}>
@@ -248,22 +262,32 @@ const Calendar = () => {
           p: 1,
           color: 'text.primary',
         }}
-        style={{
-          '--fc-page-bg-color': palette.background.default,
-          '--fc-border-color': palette.divider,
-          '--fc-today-bg-color': `${palette.info.main}0A`,
-          '--fc-now-indicator-color': palette.error.main,
-          '--fc-neutral-bg-color': palette.background.paper,
-          '--fc-neutral-text-color': palette.text.secondary,
-          '--fc-list-event-hover-bg-color': palette.action.selected,
-        } as React.CSSProperties}
       >
+        <Box
+          style={{
+            '--fc-page-bg-color': palette.background.default,
+            '--fc-border-color': palette.divider,
+            '--fc-today-bg-color': `${palette.info.main}0A`,
+            '--fc-now-indicator-color': palette.error.main,
+            '--fc-neutral-bg-color': palette.background.paper,
+            '--fc-neutral-text-color': palette.text.secondary,
+            '--fc-list-event-hover-bg-color': palette.action.selected,
+          } as React.CSSProperties}
+          sx={{ height: '100%' }}
+        >
         <FullCalendar
           ref={calendarRef}
           height="100%"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+          customButtons={{
+            toggleSidebar: {
+              icon: sidebarOpen ? 'chevron-left' : 'chevron-right',
+              hint: sidebarOpen ? 'Hide navigation pane' : 'Show navigation pane',
+              click: () => setSidebarOpen((prev) => !prev),
+            },
+          }}
           headerToolbar={{
-            start: 'prev,next today',
+            start: 'toggleSidebar prev,next today',
             center: 'title',
             end: 'timeGridWeek,timeGridDay,dayGridMonth,listMonth',
           }}
@@ -281,6 +305,7 @@ const Calendar = () => {
           eventClick={handleEventClick}
           initialEvents={getInitialEvents(palette)}
         />
+        </Box>
       </Box>
 
       {/* ── DIALOGS ── */}
@@ -297,6 +322,7 @@ const Calendar = () => {
         event={clickedEvent}
         onClose={handleDetailDialogClose}
         onDelete={handleDeleteEvent}
+        onUpdate={handleUpdateEvent}
       />
     </Box>
   )
