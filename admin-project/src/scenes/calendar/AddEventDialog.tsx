@@ -12,7 +12,7 @@ import {
   Switch,
   TextField,
 } from '@mui/material'
-import { DatePicker, DateTimePicker } from '@mui/x-date-pickers'
+import { MobileDatePicker, MobileDateTimePicker } from '@mui/x-date-pickers'
 
 export interface EventFormData {
   title: string
@@ -70,7 +70,18 @@ const AddEventDialogContent = ({
     })
   }
 
-  const Picker = allDay ? DatePicker : DateTimePicker
+  const pickerSlotProps = {
+    textField: { fullWidth: true, required: true } as const,
+    dialog: {
+      sx: {
+        '& .MuiDialogContent-root': {
+          overflow: 'hidden',
+        },
+      },
+    },
+  }
+
+  const Picker = allDay ? MobileDatePicker : MobileDateTimePicker
 
   return (
     <Box
@@ -114,17 +125,15 @@ const AddEventDialogContent = ({
               label="Start"
               value={start}
               onChange={handleStartChange}
-              slotProps={{
-                textField: { fullWidth: true, required: true },
-              }}
+              ampmInClock
+              slotProps={pickerSlotProps}
             />
             <Picker
               label="End"
               value={end}
               onChange={setEnd}
-              slotProps={{
-                textField: { fullWidth: true, required: true },
-              }}
+              ampmInClock
+              slotProps={pickerSlotProps}
             />
           </Stack>
         </Stack>
@@ -143,7 +152,12 @@ export const AddEventDialog = ({
   open,
   ...contentProps
 }: AddEventDialogProps) => (
-  <Dialog open={open} onClose={contentProps.onClose} fullWidth maxWidth="sm">
+  <Dialog
+    open={open}
+    onClose={contentProps.onClose}
+    fullWidth
+    maxWidth="sm"
+  >
     {open && <AddEventDialogContent {...contentProps} />}
   </Dialog>
 )
