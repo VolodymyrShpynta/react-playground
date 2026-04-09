@@ -11,6 +11,7 @@ import Form from './scenes/form';
 import Calendar from './scenes/calendar/calendar';
 import FAQ from './scenes/faq';
 import Bar from './scenes/bar';
+import Pie from './scenes/pie';
 
 function App() {
   const [theme, colorModeToggle] = useColorTheme();
@@ -32,7 +33,7 @@ function App() {
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/bar" element={<Bar />} />
-              {/* <Route path="/pie" element={<Pie />} /> */}
+              <Route path="/pie" element={<Pie />} />
               {/* <Route path="/line" element={<Line />} /> */}
               {/* <Route path="/geography" element={<Geography />} /> */}
             </Routes>
